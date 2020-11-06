@@ -54,7 +54,7 @@ nvcc编译器在编译过程中，将设备代码从主机代码中分离出来�
 
 从命令行运行可执行文件，这个文件有可在GPU上运行的内核代码
 
-[hello world](https://github.com/ReyRen/cuda-programming-examples/blob/master/%E5%9F%BA%E4%BA%8ECUDA%E7%9A%84%E5%BC%82%E6%9E%84%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97/hello-world/hello-world.cu)
+[hello world](https://github.com/ReyRen/cuda-programming-examples/blob/master/%E5%9F%BA%E4%BA%8ECUDA%E7%9A%84%E5%BC%82%E6%9E%84%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97/hello-world.cu)
                                                                                                                                                                 
 **数据局部性**：
 
