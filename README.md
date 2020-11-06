@@ -13,3 +13,5 @@
 
 ### 目录
 [基于CUDA的异构并行计算](https://github.com/ReyRen/cuda-programming-examples/tree/master/%E5%9F%BA%E4%BA%8ECUDA%E7%9A%84%E5%BC%82%E6%9E%84%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97)
+
+[CUDA编程模型](https://github.com/ReyRen/cuda-programming-examples/tree/master/CUDA%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B)
