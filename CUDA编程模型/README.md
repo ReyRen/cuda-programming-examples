@@ -24,7 +24,11 @@ CUDA编程模式是异步的，因此GPU上进行运算的同时也可以主机�
 2. 调用核函数对存储在GPU内存中的数据进行操作
 3. 将数据从GPU内存传回CPU内存
 
-如实例:[sumArraysOnHost]()
+如实例:
+
+[sumArraysOnHost](https://github.com/ReyRen/cuda-programming-examples/blob/master/CUDA%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/sumArraysOnHost.c)
+
+[sumArrayOnDevice](https://github.com/ReyRen/cuda-programming-examples/blob/master/CUDA%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/sumArraysOnDevice.c)
 
 ### 线程管理
 
