@@ -12,6 +12,19 @@
   }
 }
 
+void checkResult(float *hostRef, float *gpuRef, const int N) {
+     double epsilon = 1.0E-8; // 0.000000001
+     bool match = 1;
+     for(int i = 0; i < N; i++) {
+             if(abs(hostRef[i] - gpuRef[i]) > epsilon) {
+                 match = 0;
+                 printf("Arrays do not match!\n");
+                 printf("host %5.2f gpu %5.2f at current %d\n", hostRef[i], gpuRef[i], i);
+                 break;
+             }
+     }
+}
+
 void initialData(float *ip, int size) {
      // generate different seed for random number
      time_t t;
@@ -83,6 +96,9 @@ int main(int argc, char **argv) {
 
     // add vector at host side for result checks
     sumArraysOnHost(h_A, h_B, hostRef, nElem);
+
+    // check device results
+    checkResult(hostRef, gpuRef, nElem);
 
     // free device global memory
     cudaFree(d_A);

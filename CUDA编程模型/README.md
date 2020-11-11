@@ -39,7 +39,7 @@ CUDA编程模式是异步的，因此GPU上进行运算的同时也可以主机�
 
 通常，一个线程格会被组织成线程块的二维数组形式，一个线程块会被组织成线程的三维数组形式。
 
-如案例[检查网络和块的索引和维度]()
+如案例[检查网络和块的索引和维度](https://github.com/ReyRen/cuda-programming-examples/blob/master/CUDA%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/sumArrayOnGPU-small-case.cu)
 
 **从主机端和设备端访问网络/块变量**:
 
@@ -70,3 +70,159 @@ grid维度表示有多少个block, block的维度表示有多少个thread
 
 核函数是在设备端执行的代码。在核函数中，需要为一个线程规定要进行的计算以及要进行的数据访问。当核函数被调用时，许多不同的CUDA线程并行执行同一个计算任务。
 用`__global__`来定义核函数
+
+### 如何理解threadIdx、 blockIdx、 blockDim、gridDim
+
+**threadIdx(.x/.y/.z代表几维索引)**: 线程所在block中各个维度上的线程号
+
+**blockIdx(.x/.y/.z代表几维索引)**: 块所在grid中各个维度上的块号
+
+**blockDim(.x/.y/.z代表各个维度上的block大小)**: block的大小也就是block中线程的数量，blockDim.x表示块中x轴上的线程数量，blockDim.y表示y轴上的线程数量，blockDim.z表示z轴上的线程数量
+
+**gridDim(.x/.y/.z代表各维度上grid的大小)**: grid的大小也就是grid中block的数量，gridDim.x表示grid中x轴上块的数量, gridDim.y表示grid中y轴上的数量..
+
+程序和总所定义的
+```
+dim3 grid(a, b, c);
+dim3 block(d, e, f);
+```
+表示的就是blockDim.x = d, blockDim.y = e, blockDim.z = f; grid.x = a, grid.y = b, grid.z = c;
+
+所有的Idx的序列号都是从左向右的！！！！
+
+来自官方的一些案例，如何计算threadIdx:
+
+**1D grid of 1D blocks**:
+
+```
+dim3 block(N);
+dim3 grid(M);
+
+__device__
+int getGlobalIdx_1D_1D() {
+    return blockIdx.x*blockDim.x 
+           + threadIdx.x;
+}
+```
+
+**1D grid of 2D blocks**:
+
+```
+dim3 block(N1, N2);
+dim3 grid(M);
+
+__device__
+int getGlobalIdx_1D_2D() {
+    return blockIdx.x*blockDim.x*blockDim.y 
+           + threadIdx.y*blockDim.x 
+           + threadIdx.x;
+}
+```
+
+**1D grid of 3D blocks**:
+```
+dim3 block(N1, N2, N3);
+dim3 grid(M);
+
+__device__
+int getGlobalIdx_1D_3D() {
+   return blockIdx.x*blockDim.x*blockDim.y*blockDim.z
+          + threadIdx.z*blockDim.y*blockDim.x
+          + threadIdx.y*blockDim.x
+          + threadIdx.x; // 3d是从最底下的一层开始的
+}
+```
+
+**2D grid of 1D blocks**:
+```
+dim3 block(N);
+dim3 grid(M1, M2);
+
+__device__
+int getGlobalIdx_2D_1D() {
+    int blockId = blockIdx.y * gridDim.x + blockIdx.x;
+    int threadId = blockId * blockDim.x + threadIdx.x;
+    return threadId;
+}
+```
+
+**2D grid of 2D blocks**:
+```
+dim3 block(N1, N2);
+dim3 grid(M1, M2);
+
+__device__
+int getGlobalIdx_2D_2D() {
+    int blockId = blockIdx.y * gridDim.x + blockIdx.x;
+    int threadId = blockId*blockDim.x*blockDim.y
+                   + threadIdx.y*blockDim.x
+                   + threadIdx.x;
+    return threadId;
+}
+```
+
+**2D grid of 3D blocks**:
+```
+dim3 block(N1, N2, N3);
+dim3 grid(M1, M2);
+
+__device__
+int getGlobalIdx_2D_3D() {
+    int blockId = blockIdx.y * gridDim.x + blockIdx.x;
+    int threadId = blockId*blockDim.x*blockDim.y*blockDim.z
+                   + threadIdx.z*blockDim.x*blockDim.y
+                   + threadIdx.y*blockDim.x
+                   + threadIdx.x;
+    return threadId;
+}
+```
+
+**3D grid of 1D blocks**:
+```
+dim3 block(N);
+dim3 grid(M1, M2, M3);
+
+__device__
+int getGlobalIdx_3D_1D() {
+    int blockId = gridDim.x * gridDim.y * blockIdx.z
+                  + blockIdx.y * gridDim.x
+                  + blockIdx.x;
+    int threadId = blockId * blockDim.x + threadIdx.x;
+    return threadId;
+}
+```
+
+**3D grid of 2D blocks**:
+```
+dim3 block(N1, N2);
+dim3 grid(M1, M2, M3);
+
+__device__
+int getGlobalIdx_3D_2D() {
+    int blockId = gridDim.x * gridDim.y * blockIdx.z
+                  + blockIdx.y * gridDim.x
+                  + blockIdx.x;
+    int threadId = blockId * blockDim.x * blockDim.y // 原则就是把上一个blockId的所有线程数先加起来，然后再层层加现在的
+                   + threadIdx.y * blockDim.x
+                   + threadIdx.x;
+    return threadId;
+}
+```
+
+**3D grid of 3D blocks**:
+```
+dim3 block(N1, N2, N3);
+dim3 grid(M1, M2, M3);
+
+__device__
+int getGlobalIdx_3D_3D() {
+    int blockId = gridDim.x * gridDim.y * blockIdx.z
+                  + blockIdx.y * gridDim.x
+                  + blockIdx.x;
+    int threadId = blockId * blockDim.x * blockDim.y * blockDim.z
+                   + blockDim.x * blockDim.y * threadIdx.z
+                   + threadIdx.x * threadIdx.y
+                   + threadIdx.x;
+    return threadIdx;
+}
+```
