@@ -237,4 +237,39 @@ nvprof的结果要比CPU计时器的精确，因为CPU计时器测量的时间�
 
 通常情况下，一个矩阵用行优先的方式在全局内存中进行线性存储。
 
-案例如：[检查块和线程索引]()
+案例如：[检查块和线程索引](https://github.com/ReyRen/cuda-programming-examples/blob/master/CUDA%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B/checkThreadIndex.cu)
+
+从矩阵加法的例子中可以看出：
+
+1. 改变执行配置中对内核性能有影响
+2. 传统的核函数实现一般不能获得最佳性能
+3. 对于一个给定的核函数，尝试使用不同的网格和线程块大小可以获得更好的性能
+
+### 确定最优GPU
+
+对于多GPU，在每个GPU不同的情况下，选择性能最好的GPU运行核函数是非常重要的。通过比较多处理器的数量选出计算能力最好的GPU。
+```
+int numDevices = 0;
+cudaGetDeviceCount(&numDevices);
+if(numDevices > 1) {
+    int maxMultiprocessors = 0, maxDevice = 0;
+    for(int device = 0; device < numDevices; device++) {
+       cudaDeviceProp props;
+       cudaGetDeviceProperties(&props, device);
+       if(maxMultiprocessors < props.multiProcessorCount){
+           maxMultiprocessors = props.multiProcessorCount;
+           maxDevice = device;
+       }
+    }
+    cudaSetDevice(maxDevice); // set device to be used for GPU executions
+    // paramaters device: device on which the active host thread should execute the device code.
+}
+```
+
+### 在运行时指定设备
+
+支持多GPU的系统是很常见的。使用环境变量`CUDA_VISIBLE_DEVICES`就可以在运行时指定所选择的GPU且无需更改应用程序。
+
+设置运行是CUDA_VISIBLE_DEVICES=2, nvidia驱动程序会自动屏蔽其他GPU，这是设备2作为设备0出现在应用程序中。
+
+CUDA_VISIBLE_DEVICES=2,3. 在运行时驱动只使用ID为2和3的设备，并且将设备ID分别映射为0和1.
