@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     cudaMalloc((float **)&d_A, nBytes);
     cudaMalloc((float **)&d_B, nBytes);
     cudaMalloc((float **)&d_C, nBytes);
-
+ 
     // transfer data from host to device
     cudaMemcpy(d_A, h_A, nBytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, h_B, nBytes, cudaMemcpyHostToDevice);
