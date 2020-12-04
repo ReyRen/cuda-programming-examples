@@ -1,4 +1,4 @@
-CU_APPS=simpleDivergence
+CU_APPS=simpleDeviceQuery
 C_APPS=
 
 all: ${C_APPS} ${CU_APPS}
